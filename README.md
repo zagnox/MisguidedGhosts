@@ -411,3 +411,4 @@ Dhe jemi root
 
 ![rooted](https://github.com/zagnox/MisguidedGhosts/assets/144890045/1165159a-25a1-4bd9-bb46-2edbed471cbb)
 
+![tenor-2056549936](https://github.com/zagnox/MisguidedGhosts/assets/144890045/a077e03e-78b4-4bd5-bb46-44a2c1372a37)
