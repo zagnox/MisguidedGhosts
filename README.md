@@ -60,6 +60,21 @@ ftp> dir
 226 Directory send OK.
 ```
 Nga hintet qe ndodhen brenda fileve kuptojme qe duhet perdorur knock. Perdorim knock per te evituar masen e sigurise port knocking. Portat i gjejme ne pcap me wireshark.
+```
+cat jokes.txt     
+Taylor: Knock, knock.
+Josh:   Who's there?
+Taylor: The interrupting cow.
+Josh:   The interrupting cow--
+Taylor: Moo
+
+Josh:   Knock, knock.
+Taylor: Who's there?
+Josh:   Adore.
+Taylor: Adore who?
+Josh:   Adore is between you and I so please open up!
+```
+
 ![Wireshark_1](https://github.com/zagnox/MisguidedGhosts/assets/144890045/66c6d0f3-5292-4be8-809d-ddfd9d951e7a)
 
 ```
@@ -77,10 +92,45 @@ Pasi kryejme port knocking dhe skanojme serish shohim qe porta 8080 eshte hapur 
 Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
 ```
-6. Ne browser shohim nje website minimalist. Perdorim gobuster per te kryer directory brute forcing.
+Ne browser shohim nje website minimalist. Perdorim gobuster per te kryer directory brute forcing.
+![webapp](https://github.com/zagnox/MisguidedGhosts/assets/144890045/3f587f78-376f-4482-a839-6bfbe5f2956c)
 
-8. Sqlmap tregon qe nuk ka mundesi per sql injection prandaj mbetet te tentojme brute forcing. krijojme nje wordlist me username potencial dhe provojme teknika te ndryshme. Duke perdorur intruderin me battery ram attack gjejme kredencialet zac:zac
-9. Tentojme XSS dhe SSTI me burpsuite intruder per te gjetur vulnerabilitete. Me burpsuite arrijme te dallojme nje xss qe eshte patchuar. Tentojme te shmangim filtrat dhe arrijme te gjejm nje payload qe funksionon.
+```
+gobuster dir -u https://10.10.132.38:8080/ -w /usr/share/seclists/Discovery/Web-Content/directory-list.txt
+
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     https://10.10.132.38:8080/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/directory-list.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/login
+```
+Sqlmap tregon qe nuk ka mundesi per sql injection prandaj mbetet te tentojme brute forcing. krijojme nje wordlist me username potencial dhe provojme teknika te ndryshme me burp intruder. Duke perdorur intruderin me battering ram attack gjejme kredencialet zac:zac
+```
+cat users.txt
+admin
+administrator
+josh
+taylor
+adore
+zac
+```
+![intruder](https://github.com/zagnox/MisguidedGhosts/assets/144890045/c9ca1530-064a-4d4f-bb5e-4ed60fa8a828)
+
+Logohemi me kredencialet e gjetura dhe hyjme ne dashboard ku mund te krijojme postime
+
+![webapp_dashboard](https://github.com/zagnox/MisguidedGhosts/assets/144890045/c3c131f6-e3a1-494e-b2b8-5581ba297d34)
+
+9. Tentojme XSS dhe SSTI me burp intruder per te gjetur vulnerabilitete. Me burpsuite arrijme te dallojme nje xss qe eshte patchuar. Tentojme te shmangim filtrat dhe arrijme te gjejm nje payload qe funksionon.
 10. Hapi i rradhes eshte te kapim cookien e adminit duke derguar nje request drejt IP tone.
 11. Pasi kapim cookien dhe logohemi kryejme directory brute forcing dhe zbulojme /photos. Kur ngarkojme dicka shohim qe ne url kemi nje parameter te quajtur image. Duke tentuar per directory traversal dhe command injection disa komanda jane suksesshme.
 12. Kur tentojme te marrim nje reverse shell me command injection shohim se hapesirat filtrohen. Per te shmangur hapesirat perdorim ${IFS}.
